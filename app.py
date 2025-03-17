@@ -1,4 +1,5 @@
-import requests  # Make sure this is imported at the top
+import requests
+from flask import Flask, render_template, request, redirect, url_for, session
 from flask import Flask
 from flask_mysqldb import MySQL
 from static.scripts.forms import LoginForm, RegistrationForm  # Import your form classes
@@ -6,6 +7,8 @@ from flask import render_template, redirect, url_for, session
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import Flask
 from flask_mysqldb import MySQL
+from flask import Flask, render_template, request, redirect, url_for, session
+
 
 app = Flask(__name__)
 
@@ -30,42 +33,58 @@ def register():
         username = request.form['username']
         email = request.form['email']
         password = request.form['password']
-        hashed_password = generate_password_hash(password)  # Hash password before storing
+        
+        hashed_pw = generate_password_hash(password)  # ✅ Ensure password is hashed
 
         cur = mysql.connection.cursor()
-        cur.execute("SELECT * FROM users WHERE email=%s", (email,))
+        cur.execute("SELECT id FROM users WHERE username=%s", (username,))
         existing_user = cur.fetchone()
 
         if existing_user:
-            msg = "Email already registered!"
+            msg = "Account already exists!"
         else:
             cur.execute("INSERT INTO users (username, email, password) VALUES (%s, %s, %s)", 
-                        (username, email, hashed_password))
+                        (username, email, hashed_pw))  # ✅ Store hashed password
             mysql.connection.commit()
-            msg = "Registration successful! Please log in."
+            msg = "You have successfully registered!"
+
         cur.close()
     return render_template('register.html', msg=msg)
 
-app.route('/login', methods=['GET', 'POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
     msg = ""
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
 
-        cur = mysql.connection.cursor(dictionary=True)
-        cur.execute("SELECT * FROM users WHERE username=%s", (username,))
+        cur = mysql.connection.cursor()
+        cur.execute("SELECT id, username, password FROM users WHERE username=%s", (username,))
         user = cur.fetchone()
         cur.close()
 
-        if user and check_password_hash(user['password'], password):  # Verify hashed password
-            session['loggedin'] = True
-            session['user_id'] = user['id']
-            session['username'] = user['username']
-            return redirect(url_for('products'))  # Redirect to products page after login
+        if user:
+            stored_password = user[2]  # Assuming password is the third column
+            
+            print("Entered Password:", password)
+            print("Stored Hash:", stored_password)
+
+            if check_password_hash(stored_password, password):  # ✅ Verify hashed password
+                print("✅ Password matches!")
+                session['loggedin'] = True
+                session['user_id'] = user[0]
+                session['username'] = user[1]
+                return redirect(url_for('products'))
+            else:
+                print("❌ Password does NOT match!")
+                msg = "Incorrect username or password."
         else:
-            msg = "Incorrect username or password."
+            msg = "User not found."
+
     return render_template('login.html', msg=msg)
+
+
+
 
 
 @app.route('/logout')
