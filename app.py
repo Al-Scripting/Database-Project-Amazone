@@ -164,11 +164,6 @@ def add_to_cart(pid):
 
     available_stock = stock_result[0]
 
-    if quantity > available_stock:
-        flash(f"Only {available_stock} items available!", "error")  # ✅ Show in UI
-        return redirect(url_for('products'))  # ✅ Redirect back instead of JSON page
-
-
     # Check if item is already in cart
     cur.execute("SELECT Quantity FROM Cart WHERE UserID=%s AND ItemID=%s", (user_id, pid))
     result = cur.fetchone()
