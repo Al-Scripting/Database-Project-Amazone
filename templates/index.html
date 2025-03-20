@@ -27,7 +27,9 @@
         {% if product['Stock'] > 0 %}
         <form action="{{ url_for('add_to_cart', pid=product['ItemID']) }}" method="POST">
             <input type="number" name="quantity" min="1" max="{{ product['Stock'] }}" value="1">
-            <button type="submit" class="add-to-cart">Add to Cart</button>
+            <button type="submit" class="add-to-cart" {% if product.Stock == 0 %}disabled{% endif %}>
+                {% if product.Stock == 0 %}Sold Out{% else %}Add to Cart{% endif %}
+            </button>
         </form>
         {% else %}
         <button class="sold-out" disabled>Sold Out</button>

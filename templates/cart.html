@@ -18,7 +18,7 @@
     <td>${{ item.Price }}</td>
     <td>
         <form action="{{ url_for('update_cart', cart_id=item.CartID) }}" method="POST">
-            <input type="number" name="quantity" value="{{ item.Quantity }}" min="1" max="{{ item.Stock }}">
+            <input type="number" name="quantity" value="{{ item.Quantity }}" min="1" max="{{ item.Stock + item.Quantity if item.Stock else item.Quantity }}">
             <button type="submit">Update</button>
         </form>
     </td>

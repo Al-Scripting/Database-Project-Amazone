@@ -165,7 +165,9 @@ def add_to_cart(pid):
     available_stock = stock_result[0]
 
     if quantity > available_stock:
-        return jsonify({"error": f"Only {available_stock} items available!"}), 400
+        flash(f"Only {available_stock} items available!", "error")  # ✅ Show in UI
+        return redirect(url_for('products'))  # ✅ Redirect back instead of JSON page
+
 
     # Check if item is already in cart
     cur.execute("SELECT Quantity FROM Cart WHERE UserID=%s AND ItemID=%s", (user_id, pid))
@@ -173,7 +175,7 @@ def add_to_cart(pid):
 
     if result:
         current_quantity = result[0]
-        if current_quantity + quantity > available_stock:
+        if quantity > available_stock:
             return jsonify({"error": f"Only {available_stock} items available!"}), 400
 
         cur.execute("UPDATE Cart SET Quantity = Quantity + %s WHERE UserID=%s AND ItemID=%s",
@@ -189,10 +191,9 @@ def add_to_cart(pid):
     cur.close()
 
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-        return jsonify({"message": "Item added to cart!"})
-
-    flash("Item added to cart!", "success")
-    return redirect(url_for('cart'))
+        return jsonify({"message": "Item added to cart!"})  # ✅ Keep JSON for AJAX calls
+    else:
+        return redirect(url_for('products'))  # ✅ Redirect back to products instead of showing JSON
 
 
 @app.route('/update_cart/<int:cart_id>', methods=['POST'])

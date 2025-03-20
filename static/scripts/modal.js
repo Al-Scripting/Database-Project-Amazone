@@ -11,13 +11,16 @@ function openModal(id, title, description, price, stock, image) {
     const quantityInput = document.getElementById("modal-quantity");
     quantityInput.value = 1;
     quantityInput.max = stock;
+    quantityInput.disabled = stock === 0; // 🔥 Disable input if out of stock
 
     const modalCartBtn = document.getElementById("modal-add-to-cart");
+    modalCartBtn.disabled = stock === 0; // 🔥 Disable button if out of stock
     modalCartBtn.onclick = function () {
-        addToCart(id, quantityInput.value);
+        if (stock > 0) {
+            addToCart(id, quantityInput.value);
+        }
     };
 }
-
 
 // Close modal
 function closeModal() {
@@ -46,7 +49,16 @@ function addToCart(productId, quantity) {
     .then(data => {
         if (data.message) {
             showNotification(data.message, "success");
-            document.getElementById(`stock-${productId}`).innerText = data.sold_out ? "Sold Out" : data.new_stock;
+
+            // 🔥 Update stock dynamically on the product page
+            const stockElement = document.getElementById(`stock-${productId}`);
+            if (data.sold_out) {
+                stockElement.innerText = "Sold Out";
+                stockElement.closest(".product-card").querySelector(".add-to-cart").disabled = true;
+            } else {
+                stockElement.innerText = `Stock: ${data.new_stock}`;
+            }
+
             closeModal();
         } else {
             showNotification(data.error, "error");
