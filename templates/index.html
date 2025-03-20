@@ -1,16 +1,61 @@
-<!-- templates/index.html -->
 {% extends "base.html" %}
 
+{% block title %}Product Listings{% endblock %}
+
 {% block content %}
-<h2>Products</h2>
-<div class="products">
+<h2 class="text-center">Our Products</h2>
+
+<div class="product-container">
     {% for product in products %}
     <div class="product-card">
-        <img src="{{ product['image'] }}" alt="{{ product['title'] }}" width="100">
-        <h3>{{ product['title'] }}</h3>
-        <p>Price: ${{ product['price'] }}</p>
-        <a href="{{ url_for('add_to_cart', pid=product['id']) }}" class="btn">Add to Cart</a>
+        <img src="{{ product['ImageURL'] }}" class="product-image" 
+        alt="{{ product['Name'] }}" 
+        onclick="openModal(
+            '{{ product['ItemID'] }}',
+            '{{ product['Name'] | escape }}',
+            '{{ product['Description'] | escape }}',
+            '{{ product['Price'] }}',
+            '{{ product['Stock'] }}',
+            '{{ product['ImageURL'] }}'
+         )">
+    
+        <h3 class="product-title">{{ product.get('Name', 'Unknown') }}</h3>
+        <p class="product-description">{{ product.get('Description', '')[:80] }}...</p>
+        <p class="product-price">${{ product.get('Price', '0') }}</p>
+        <p>Stock: <span id="stock-{{ product.get('ItemID', '0') }}">{{ product.get('Stock', '0') }}</span></p>
+    
+        {% if product['Stock'] > 0 %}
+        <form action="{{ url_for('add_to_cart', pid=product['ItemID']) }}" method="POST">
+            <input type="number" name="quantity" min="1" max="{{ product['Stock'] }}" value="1">
+            <button type="submit" class="add-to-cart">Add to Cart</button>
+        </form>
+        {% else %}
+        <button class="sold-out" disabled>Sold Out</button>
+        {% endif %}
     </div>
     {% endfor %}
+    
 </div>
+
+<!-- Product Modal -->
+<div id="product-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <img id="modal-image" src="" class="product-image" alt="">
+        <h3 id="modal-title"></h3>
+        <p id="modal-description"></p>
+        <p id="modal-price" class="product-price"></p>
+        <p id="modal-stock"></p>
+
+        <label for="modal-quantity">Quantity:</label>
+        <input type="number" id="modal-quantity" value="1" min="1" max="10">
+
+        <button id="modal-add-to-cart">Add to Cart</button>
+    </div>
+</div>
+
+<script src="/static/scripts/modal.js"></script>
+
+
+<div id="notification-container"></div>
 {% endblock %}

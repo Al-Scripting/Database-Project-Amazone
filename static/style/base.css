@@ -1,62 +1,255 @@
-/* static/style.css */
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background: #f5f5f5;
-}
-
-.navbar {
-    background: #333;
-    color: white;
-    padding: 15px;
+/* ================= HEADER STYLES ================= */
+header {
+    background: #232F3E;
+    color: #fff;
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
 }
 
-.nav-links {
-    list-style: none;
-    display: flex;
-    gap: 20px;
-}
-
-.nav-links li {
-    display: inline;
-}
-
-.nav-links a {
-    color: white;
+.logo a {
+    color: #FF9900;
+    font-size: 24px;
+    font-weight: bold;
     text-decoration: none;
 }
 
-.products {
+nav ul {
+    list-style: none;
     display: flex;
-    flex-wrap: wrap;
+    gap: 15px;
+}
+
+nav ul li a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 16px;
+}
+
+/* ================= PRODUCT GRID ================= */
+.product-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* Fixes 5th item issue */
     gap: 20px;
+    padding: 20px;
+    position: relative;
+    z-index: 1;
 }
 
 .product-card {
     background: white;
-    padding: 10px;
-    border: 1px solid #ddd;
-    width: 200px;
-}
-
-table {
-    width: 100%;
-    background: white;
-    border-collapse: collapse;
-}
-
-th, td {
-    border: 1px solid #ddd;
-    padding: 8px;
-}
-
-button {
-    background: #28a745;
-    color: white;
-    padding: 5px 10px;
-    border: none;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
     cursor: pointer;
+    pointer-events: auto;
+    position: relative;
+    z-index: 2;
+}
+
+.product-card:hover {
+    transform: scale(1.05);
+}
+
+.product-image {
+    width: 100%;
+    height: 250px;
+    object-fit: contain;
+}
+
+.product-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+.product-description {
+    font-size: 14px;
+    color: #555;
+    height: 50px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.read-more {
+    color: #FF9900;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.product-price {
+    font-size: 16px;
+    font-weight: bold;
+    color: #B12704;
+    margin: 5px 0;
+}
+
+.add-to-cart {
+    background: #FF9900;
+    color: white;
+    border: none;
+    pointer-events: auto !important;
+    padding: 10px;
+    width: 100%;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.add-to-cart:hover {
+    background: #CC7A00;
+}
+
+/* ================= MODAL STYLES ================= */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85); /* Darker background */
+    backdrop-filter: blur(8px);
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* When modal is active */
+.modal.show {
+    display: flex;
+    opacity: 1;
+}
+
+/* Modal Content */
+.modal-content {
+    background: white;
+    padding: 20px;
+    width: 90%;
+    max-width: 600px;
+    border-radius: 12px;
+    position: relative;
+    animation: fadeInUp 0.3s ease-out;
+}
+/* Close Button */
+.close-modal {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    font-size: 22px;
+    cursor: pointer;
+    color: #555;
+    transition: color 0.3s;
+}
+
+.close-modal:hover {
+    color: #FF9900;
+}
+
+/* Product Image */
+#modal-image {
+    width: 100%;
+    max-height: 300px;
+    object-fit: contain;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+/* Modal Title */
+#modal-title {
+    font-size: 22px;
+    font-weight: bold;
+    text-align: center;
+    color: #232F3E;
+    margin-bottom: 10px;
+}
+
+/* Modal Description */
+#modal-description {
+    font-size: 16px;
+    text-align: center;
+    color: #555;
+    margin-bottom: 15px;
+}
+
+/* Price */
+#modal-price {
+    font-size: 18px;
+    font-weight: bold;
+    color: #B12704;
+    margin-bottom: 10px;
+}
+
+/* Stock */
+#modal-stock {
+    font-size: 14px;
+    color: #777;
+    margin-bottom: 15px;
+}
+
+/* Add to Cart Button */
+.add-to-cart {
+    background: #FF9900;
+    color: white;
+    border: none;
+    padding: 12px;
+    width: 100%;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.add-to-cart:hover {
+    background: #CC7A00;
+}
+
+/* ================= ANIMATIONS ================= */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* ================= NOTIFICATION DESIGN ================= */
+#notification-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 10px 20px;
+    color: white;
+    border-radius: 5px;
+    background: green;
+    opacity: 0.9;
+    transition: opacity 0.3s;
+}
+
+.notification.error {
+    background: #dc3545; /* Red for errors */
+}
+
+@keyframes fadeOut {
+    0% { opacity: 1; }
+    70% { opacity: 1; }
+    100% { opacity: 0; transform: translateY(-20px); }
 }

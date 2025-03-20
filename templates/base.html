@@ -1,35 +1,37 @@
-<!-- templates/base.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flask Shop</title>
+    <title>My Store</title>
     <link rel="stylesheet" href="/static/style/base.css">
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
 <body>
+    <header>
+        <div class="logo">
+            <a href="{{ url_for('products') }}">MyStore</a>
+        </div>
+        <nav>
+            <ul>
+                {% if 'loggedin' in session %}
+                    <li>Welcome, {{ session['username'] }}!</li>
+                    <li><a href="{{ url_for('cart') }}">Cart</a></li>
+                    <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('login') }}">Login</a></li>
+                    <li><a href="{{ url_for('register') }}">Register</a></li>
+                    <li><a href="{{ url_for('cart') }}">Cart</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+    
+    <div id="notification-container"></div>
 
-    <nav class="navbar">
-        <a href="{{ url_for('products') }}" class="brand">Flask Shop</a>
-        <ul class="nav-links">
-            {% if session.get('loggedin') %}
-                <li><a href="{{ url_for('logout') }}">Logout ({{ session['username'] }})</a></li>
-            {% else %}
-                <li><a href="{{ url_for('login') }}">Login</a></li>
-                <li><a href="{{ url_for('register') }}">Register</a></li>
-            {% endif %}
-            <li>
-                <a href="{{ url_for('cart') }}">
-                    <i class="fas fa-shopping-cart"></i> Cart ({{ session.get('cart_count', 0) }})
-                </a>
-            </li>
-        </ul>
-    </nav>
 
-    <div class="content">
+
+    <main>
         {% block content %}{% endblock %}
-    </div>
-
+    </main>
 </body>
 </html>
