@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Fake Payment Page</h2>
+
+<form action="{{ url_for('pay') }}" method="POST" class="payment-form">
+    <label for="name">Cardholder Name:</label>
+    <input type="text" name="name" required>
+
+    <label for="card">Card Number (16 digits):</label>
+    <input type="text" name="card" pattern="\d{16}" required>
+
+    <label for="cvc">CVC (3 digits):</label>
+    <input type="text" name="cvc" pattern="\d{3}" required>
+
+    <label for="expiry_month">Expiry Month:</label>
+    <select name="expiry_month" required>
+        {% for m in range(1, 13) %}
+            <option value="{{ m }}">{{ "%02d"|format(m) }}</option>
+        {% endfor %}
+    </select>
+
+    <label for="expiry_year">Expiry Year:</label>
+    <select name="expiry_year" required>
+        {% for y in range(current_year, current_year + 10) %}
+            <option value="{{ y }}">{{ y }}</option>
+        {% endfor %}
+    </select>
+
+    <p><strong>Shipping To:</strong> {{ user_address }}</p>
+    <p><strong>Shipping From:</strong> Amazone Fulfillment Warehouse, Toronto, ON</p>
+
+    <button type="submit">Pay Now</button>
+</form>
+{% endblock %}

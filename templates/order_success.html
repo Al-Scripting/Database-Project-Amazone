@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Order Successful!</h2>
+<p>Thank you for your purchase.</p>
+<p><strong>Your Order Number:</strong> {{ order_id }}</p>
+<a href="{{ url_for('products') }}">Continue Shopping</a>
+{% endblock %}

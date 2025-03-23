@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Transaction History</h2>
+
+<form action="{{ url_for('clear_my_transactions') }}" method="POST">
+    <button type="submit" class="admin-btn">🧹 Clear My Transaction History</button>
+</form>
+
+{% if orders %}
+    {% for order in orders %}
+    <div class="order-block">
+        <h3>Order #{{ order.OrderID }}</h3>
+        <p><strong>Status:</strong> {{ order.PaymentStatus or "Pending" }}</p>
+        <p><strong>Date:</strong> {{ order.TransactionDate.strftime('%Y-%m-%d %H:%M') if order.TransactionDate else "N/A" }}</p>
+        <p><strong>Shipping To:</strong> {{ order.DestinationAddress }}</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Quantity</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in order.Items %}
+                <tr>
+                    <td>{{ item.ItemName }}</td>
+                    <td>{{ item.Quantity }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <hr>
+    </div>
+    {% endfor %}
+{% else %}
+    <p>No transactions yet.</p>
+{% endif %}
+{% endblock %}

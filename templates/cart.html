@@ -3,6 +3,8 @@
 {% block content %}
 <h2>Your Shopping Cart</h2>
 
+<p><a href="{{ url_for('transaction_history') }}">View Transaction History</a></p>
+
 {% if items %}
 <table>
     <tr>
@@ -13,27 +15,31 @@
         <th>Action</th>
     </tr>
     {% for item in items %}
-<tr>
-    <td>{{ item.Name }}</td>
-    <td>${{ item.Price }}</td>
-    <td>
-        <form action="{{ url_for('update_cart', cart_id=item.CartID) }}" method="POST">
-            <input type="number" name="quantity" value="{{ item.Quantity }}" min="1" max="{{ item.Stock + item.Quantity if item.Stock else item.Quantity }}">
-            <button type="submit">Update</button>
-        </form>
-    </td>
-    <td>${{ item.Price * item.Quantity }}</td>
-    <td>
-        <a href="{{ url_for('remove_from_cart', cart_id=item.CartID) }}">Remove</a>
-    </td>
-</tr>
-{% endfor %}
-
+    <tr>
+        <td>{{ item.Name }}</td>
+        <td>${{ item.Price }}</td>
+        <td>
+            <form action="{{ url_for('update_cart', cart_id=item.CartID) }}" method="POST">
+                <input type="number" name="quantity" value="{{ item.Quantity }}" min="1" max="{{ item.Stock + item.Quantity if item.Stock else item.Quantity }}">
+                <button type="submit">Update</button>
+            </form>
+        </td>
+        <td>${{ item.Price * item.Quantity }}</td>
+        <td>
+            <a href="{{ url_for('remove_from_cart', cart_id=item.CartID) }}">Remove</a>
+        </td>
+    </tr>
+    {% endfor %}
 </table>
 
 <p><strong>Total Price: ${{ total }}</strong></p>
 
+<form action="{{ url_for('payment') }}" method="GET">
+    <button type="submit" class="checkout-btn">Buy Now</button>
+</form>
+
 {% else %}
 <p>Your cart is empty!</p>
+
 {% endif %}
 {% endblock %}

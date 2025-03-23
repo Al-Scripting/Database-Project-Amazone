@@ -10,25 +10,18 @@
     <div class="product-card">
         <img src="{{ product['ImageURL'] }}" class="product-image" 
         alt="{{ product['Name'] }}" 
-        onclick="openModal(
-            '{{ product['ItemID'] }}',
-            '{{ product['Name'] | escape }}',
-            '{{ product['Description'] | escape }}',
-            '{{ product['Price'] }}',
-            '{{ product['Stock'] }}',
-            '{{ product['ImageURL'] }}'
-         )">
+        onclick='openModal({{ product["ItemID"] }}, {{ product["Name"]|tojson }}, {{ product["Description"]|tojson }}, {{ product["Price"] }}, {{ product["Stock"] }}, {{ product["ImageURL"]|tojson }})'>
     
         <h3 class="product-title">{{ product.get('Name', 'Unknown') }}</h3>
         <p class="product-description">{{ product.get('Description', '')[:80] }}...</p>
         <p class="product-price">${{ product.get('Price', '0') }}</p>
-        <p>Stock: <span id="stock-{{ product.get('ItemID', '0') }}">{{ product.get('Stock', '0') }}</span></p>
+        <p><span id="stock-{{ product.get('ItemID', '0') }}">Stock: {{ product.get('Stock', '0') }}</span></p>
     
         {% if product['Stock'] > 0 %}
         <form action="{{ url_for('add_to_cart', pid=product['ItemID']) }}" method="POST">
             <input type="number" name="quantity" min="1" max="{{ product['Stock'] }}" value="1">
-            <button type="submit" class="add-to-cart" {% if product.Stock == 0 %}disabled{% endif %}>
-                {% if product.Stock == 0 %}Sold Out{% else %}Add to Cart{% endif %}
+            <button type="submit" class="add-to-cart">
+                Add to Cart
             </button>
         </form>
         {% else %}
@@ -36,7 +29,6 @@
         {% endif %}
     </div>
     {% endfor %}
-    
 </div>
 
 <!-- Product Modal -->
@@ -47,7 +39,8 @@
         <h3 id="modal-title"></h3>
         <p id="modal-description"></p>
         <p id="modal-price" class="product-price"></p>
-        <p id="modal-stock"></p>
+        <p>Stock: <span id="modal-stock-{{ product.ItemID }}">{{ product.Stock }}</span></p>
+
 
         <label for="modal-quantity">Quantity:</label>
         <input type="number" id="modal-quantity" value="1" min="1" max="10">
@@ -58,6 +51,12 @@
 
 <script src="/static/scripts/modal.js"></script>
 
-
 <div id="notification-container"></div>
+
+{% if session.username == 'Admin' %}
+    <form action="{{ url_for('restock_items') }}" method="POST" style="margin-top: 20px;">
+        <button type="submit" class="admin-btn">🔁 Restock All Items</button>
+    </form>
+{% endif %}
+
 {% endblock %}

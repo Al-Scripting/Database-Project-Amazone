@@ -11,10 +11,10 @@ function openModal(id, title, description, price, stock, image) {
     const quantityInput = document.getElementById("modal-quantity");
     quantityInput.value = 1;
     quantityInput.max = stock;
-    quantityInput.disabled = stock === 0; // 🔥 Disable input if out of stock
+    quantityInput.disabled = stock === 0;
 
     const modalCartBtn = document.getElementById("modal-add-to-cart");
-    modalCartBtn.disabled = stock === 0; // 🔥 Disable button if out of stock
+    modalCartBtn.disabled = stock === 0;
     modalCartBtn.onclick = function () {
         if (stock > 0) {
             addToCart(id, quantityInput.value);
@@ -22,13 +22,15 @@ function openModal(id, title, description, price, stock, image) {
     };
 }
 
-// Close modal
 function closeModal() {
     const modal = document.getElementById("product-modal");
     modal.classList.remove("show");
+
+    // Remove error class if present
+    const qtyInput = document.getElementById("modal-quantity");
+    if (qtyInput) qtyInput.classList.remove("input-error");
 }
 
-// Close modal on outside click
 document.addEventListener("click", function (event) {
     const modal = document.getElementById("product-modal");
     if (event.target === modal) {
@@ -45,30 +47,66 @@ function addToCart(productId, quantity) {
         },
         body: `quantity=${quantity}`
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.message) {
-            showNotification(data.message, "success");
+    .then(async (response) => {
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+            const data = await response.json();
+            const qtyInput = document.getElementById("modal-quantity");
+            if (qtyInput) qtyInput.classList.remove("input-error");
 
-            // 🔥 Update stock dynamically on the product page
-            const stockElement = document.getElementById(`stock-${productId}`);
-            if (data.sold_out) {
-                stockElement.innerText = "Sold Out";
-                stockElement.closest(".product-card").querySelector(".add-to-cart").disabled = true;
-            } else {
-                stockElement.innerText = `Stock: ${data.new_stock}`;
+            if (data.error) {
+                showNotification(data.error, "error");
+                if (qtyInput) qtyInput.classList.add("input-error");
+                return;
             }
 
-            closeModal();
+            if (data.message) {
+                showNotification(data.message, "success");
+
+                const stockElement = document.getElementById(`stock-${productId}`);
+                if (data.sold_out) {
+                    if (stockElement) stockElement.innerText = "Sold Out";
+                    document.getElementById("modal-stock").innerText = "Sold Out";
+
+                    const modalQty = document.getElementById("modal-quantity");
+                    const modalBtn = document.getElementById("modal-add-to-cart");
+                    if (modalQty) {
+                        modalQty.disabled = true;
+                        modalQty.value = 0;
+                    }
+                    if (modalBtn) modalBtn.disabled = true;
+
+                    const card = stockElement.closest(".product-card");
+                    if (card) {
+                        const cardBtn = card.querySelector(".add-to-cart");
+                        const cardQty = card.querySelector("input[name='quantity']");
+                        if (cardBtn) {
+                            cardBtn.disabled = true;
+                            cardBtn.innerText = "Sold Out";
+                        }
+                        if (cardQty) {
+                            cardQty.disabled = true;
+                            cardQty.value = 0;
+                        }
+                    }
+                } else {
+                    document.getElementById(`stock-${productId}`).innerText = `Stock: ${data.new_stock}`;
+                    document.getElementById("modal-stock").innerText = `Stock: ${data.new_stock}`;
+                }
+
+                closeModal();
+            }
         } else {
-            showNotification(data.error, "error");
+            showNotification("Unexpected server response. Please try again later.", "error");
         }
     })
     .catch(error => {
-        console.error("Error:", error);
-        showNotification("Failed to connect to the server!", "error");
+        console.error("Add to cart failed:", error);
+        showNotification("Connection error. Please try again later.", "error");
     });
 }
+
+
 
 function showNotification(message, type = "success") {
     const container = document.getElementById("notification-container");
@@ -82,4 +120,27 @@ function showNotification(message, type = "success") {
     setTimeout(() => {
         notification.remove();
     }, 3000);
+}
+
+// Optional restock hook if you use it
+function restockAll() {
+    fetch('/restock', {
+        method: 'POST'
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            for (const [itemId, newStock] of Object.entries(data.updatedStocks)) {
+                const stockSpan = document.getElementById(`stock-${itemId}`);
+                if (stockSpan) stockSpan.textContent = newStock;
+
+                const modalStockSpan = document.getElementById(`modal-stock-${itemId}`);
+                if (modalStockSpan) modalStockSpan.textContent = newStock;
+            }
+
+            showNotification("Items restocked!", "success");
+        } else {
+            showNotification("Restock failed.", "error");
+        }
+    });
 }
