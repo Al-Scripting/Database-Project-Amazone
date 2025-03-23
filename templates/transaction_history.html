@@ -1,40 +1,45 @@
 {% extends "base.html" %}
+{% block title %}Transaction History{% endblock %}
 
 {% block content %}
-<h2>Transaction History</h2>
-
-<form action="{{ url_for('clear_my_transactions') }}" method="POST">
-    <button type="submit" class="admin-btn">🧹 Clear My Transaction History</button>
-</form>
-
-{% if orders %}
-    {% for order in orders %}
-    <div class="order-block">
-        <h3>Order #{{ order.OrderID }}</h3>
-        <p><strong>Status:</strong> {{ order.PaymentStatus or "Pending" }}</p>
-        <p><strong>Date:</strong> {{ order.TransactionDate.strftime('%Y-%m-%d %H:%M') if order.TransactionDate else "N/A" }}</p>
-        <p><strong>Shipping To:</strong> {{ order.DestinationAddress }}</p>
-
-        <table>
-            <thead>
-                <tr>
-                    <th>Item</th>
-                    <th>Quantity</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in order.Items %}
-                <tr>
-                    <td>{{ item.ItemName }}</td>
-                    <td>{{ item.Quantity }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        <hr>
+<div class="transaction-history-container">
+    <div class="header-row">
+        <h2 class="history-title">📜 Transaction History</h2>
+        <form method="POST" action="{{ url_for('clear_my_transactions') }}">
+            <button class="clear-history-btn" type="submit">🗑️ Clear My Transaction History</button>
+        </form>
     </div>
-    {% endfor %}
-{% else %}
-    <p>No transactions yet.</p>
-{% endif %}
+
+    {% if orders %}
+        {% for order in orders %}
+        <div class="order-card">
+            <div class="order-header">
+                <h3 class="order-id">🛒 Order #{{ order.OrderID }}</h3>
+                <span class="status">✔️ {{ order.PaymentStatus }}</span>
+            </div>
+            <p><strong>Date:</strong> {{ order.TransactionDate.strftime('%Y-%m-%d %H:%M') if order.TransactionDate else "N/A" }}</p>
+            <p><strong>Shipping To:</strong> {{ order.DestinationAddress }}</p>
+
+            <table class="order-table">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Quantity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order.Items %}
+                    <tr>
+                        <td>{{ item.ItemName }}</td>
+                        <td>{{ item.Quantity }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p class="no-history">No transaction history yet.</p>
+    {% endif %}
+</div>
 {% endblock %}

@@ -17,7 +17,6 @@ app.config['SECRET_KEY'] = '3322c2e1203a075eb7e8b668c1198b3e4876dd02ac8fb4cd4810
 # ✅ MySQL Configuration
 app.config['MYSQL_HOST'] = 'Envy123.mysql.pythonanywhere-services.com'
 app.config['MYSQL_USER'] = 'Envy123'
-app.config['MYSQL_PASSWORD'] = 'Pa$$w0rd2025'  
 app.config['MYSQL_DB'] = 'Envy123$Amazone'
 
 mysql = MySQL(app)

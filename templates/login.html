@@ -1,19 +1,99 @@
-<!-- templates/login.html -->
 {% extends "base.html" %}
 
-{% block content %}
-<h2>Login</h2>
-<form action="{{ url_for('login') }}" method="POST">
-    <label for="username">Username:</label>
-    <input type="text" name="username" required>
-    
-    <label for="password">Password:</label>
-    <input type="password" name="password" required>
-    
-    <button type="submit">Login</button>
-</form>
+{% block title %}Login{% endblock %}
 
-{% if msg %}
-<p>{{ msg }}</p>
-{% endif %}
+{% block content %}
+<style>
+    body {
+        background: linear-gradient(to bottom, #cc7a00, #444);
+        font-family: "Segoe UI", sans-serif;
+    }
+
+    .login-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 90vh;
+    }
+
+    .login-card {
+        background-color: #fff;
+        border-radius: 20px;
+        padding: 40px;
+        width: 350px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        text-align: center;
+    }
+
+    .login-card h2 {
+        margin-bottom: 20px;
+        font-weight: 600;
+    }
+
+    .login-card input {
+        width: 100%;
+        padding: 10px;
+        margin-top: 5px;
+        margin-bottom: 20px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 14px;
+    }
+
+    .login-card button {
+        width: 100%;
+        padding: 12px;
+        border: none;
+        background-color: #000;
+        color: white;
+        border-radius: 20px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .login-card button:hover {
+        background-color: #333;
+    }
+
+    .login-card .footer-links {
+        margin-top: 20px;
+        font-size: 14px;
+    }
+
+    .login-card .footer-links a {
+        color: #000;
+        text-decoration: none;
+        margin: 0 10px;
+    }
+
+    .login-card p.msg {
+        color: red;
+        font-size: 14px;
+        margin-top: 10px;
+    }
+</style>
+
+<div class="login-container">
+    <div class="login-card">
+        <h2>Log In to Your Account</h2>
+        <form action="{{ url_for('login') }}" method="POST">
+            <label for="username">Username</label>
+            <input type="text" name="username" id="username" placeholder="yourusername" required>
+
+            <label for="password">Password</label>
+            <input type="password" name="password" id="password" placeholder="••••••••" required>
+
+            <button type="submit">Log In</button>
+        </form>
+
+        {% if msg %}
+        <p class="msg">{{ msg }}</p>
+        {% endif %}
+
+        <div class="footer-links">
+            <a href="{{ url_for('register') }}">Create an account</a>
+        </div>
+    </div>
+</div>
 {% endblock %}
